@@ -26,6 +26,19 @@ const encryptUserPW = (req, res, next) => {
   // TODO: Fill this middleware in with the Proper password encrypting, bcrypt.hash()
   // Once the password is encrypted using bcrypt you'll need to set a user obj on req.user with the encrypted PW
   // Once the user is set, call next and head back into the userController to save it to the DB
+  if (username && password) {
+    bcrypt
+      .hash(password, SaltRounds)
+      .then(hashedPassword => {
+        req.user = { username, password: hashedPassword };
+        next();
+      })
+      .catch(err => {
+        res.send(err);
+      });
+  } else {
+    res.status(422).json({ error: 'Username and Password are required.' });
+  }
 };
 
 const compareUserPW = (req, res, next) => {
